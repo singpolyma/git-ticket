@@ -1,0 +1,66 @@
+#!/bin/sh
+
+COMMIT=1
+DELETE=0
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-C)
+			COMMIT=0
+			shift
+		;;
+		-d)
+			DELETE=1
+			shift
+		;;
+		-*)
+			echo "Unsupported switch $1" 1>&2
+			exit 1
+		;;
+		*)
+			break
+		;;
+	esac
+done
+
+if [ "$DELETE" -eq 1 -a "$COMMIT" -eq 0 ]; then
+	echo "Cannot delete when not commiting." 1>&2
+	exit 1
+fi
+
+SUBDIRECTORY_OK=1
+if ! . "`git --exec-path`/git-sh-setup"; then
+	exit 1
+fi
+if ! cd_to_toplevel; then
+	exit 1
+fi
+
+mkdir -p .tickets
+cd .tickets
+
+TICKET="`echo "$*" | sed -e's/\//-/'`"
+
+if [ -z "$1" -o ! -f "$TICKET" ]; then
+	echo "You must supply a valid ticket to close." 1>&2
+	exit 1
+fi
+
+if [ -n "`grep '^Status:' "$TICKET"`" ]; then
+	DATA="`sed -e's/^Status: .*$/Status: Closed/i' "$TICKET"`"
+else
+	DATA="`sed -e"2 i\
+Status: Closed
+" "$TICKET"`"
+fi
+echo "$DATA" > "$TICKET"
+
+git add "$TICKET"
+if [ "$COMMIT" -eq 1 ]; then
+	git commit -em"Closes: $*"
+	if [ "$DELETE" -eq 1 ]; then
+		git rm "$TICKET"
+		T="`git rm "$TICKET"-* 2>&1`"
+		cd ..
+		git commit -m"Remove closed ticket $*"
+	fi
+fi
