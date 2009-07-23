@@ -1,0 +1,60 @@
+#!/bin/sh
+
+COMMIT=1
+if [ "$1" = "-C" ]; then
+	COMMIT=0
+	shift
+fi
+
+if ! . "`git --exec-path`/git-sh-setup"; then
+	exit 1
+fi
+if ! cd_to_toplevel; then
+	exit 1
+fi
+
+mkdir -p .tickets
+cd .tickets
+
+TICKET="`echo "$*" | sed -e's/\//-/'`"
+
+if [ -z "$1" -o ! -f "$TICKET" ]; then
+	echo "You must supply a valid ticket to comment on." 1>&2
+	exit 1
+fi
+
+MESSAGEID="`grep -i Message-Id < "$TICKET" | cut -d':' -f2 | sed -e's/^ *//'`"
+if [ -z "$MESSAGEID" ]; then
+	MESSAGEID="<`openssl dgst -sha1 < "$TICKET"`@`hostname`>"
+	M="`sed -e"2 i\
+Message-Id: $MESSAGEID
+" "$TICKET"`"
+	echo "$M" > "$TICKET"
+fi
+
+NAME="`mktemp`"
+
+echo -n "From: " >> "$NAME"
+git var GIT_AUTHOR_IDENT | sed -e's/^\(.*\) [^ ]* [^ ]*$/\1/' >> "$NAME"
+echo -n "Date: " >> "$NAME"
+date +"%a, %d %b %Y %H:%M:%S %z (%Z)" >> "$NAME"
+echo "In-Reply-To: $MESSAGEID" >> "$NAME"
+echo "Subject: Re: $*" >> "$NAME"
+echo >> "$NAME"
+echo >> "$NAME"
+
+git_editor "$NAME"
+
+if [ -z "`tail -n2 "$NAME" | sed -e's/\n\n//'`" ]; then
+	rm -f "$NAME"
+	echo "Cancelled" 1>&2
+	exit
+fi
+
+NEWNAME="$TICKET-`openssl dgst -sha1 < "$NAME"`"
+mv "$NAME" "$NEWNAME"
+
+git add "$NEWNAME"
+if [ "$COMMIT" -eq 1 ]; then
+	git commit -m"New Ticket: $*"
+fi

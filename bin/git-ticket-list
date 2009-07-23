@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if ! . "`git --exec-path`/git-sh-setup"; then
+	exit 1
+fi
+if ! cd_to_toplevel; then
+	exit 1
+fi
+
+if [ -d .tickets ]; then
+	cd .tickets
+	grep -vil 'In-Reply-To' *
+fi
