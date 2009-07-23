@@ -6,6 +6,7 @@ if [ "$1" = "-C" ]; then
 	shift
 fi
 
+SUBDIRECTORY_OK=1
 if ! . "`git --exec-path`/git-sh-setup"; then
 	exit 1
 fi
