@@ -53,5 +53,20 @@ fi
 
 git add "$NAME"
 if [ "$COMMIT" -eq 1 ]; then
-	git commit -m"New Ticket: $*"
+	if git commit -m"New Ticket: $*"; then
+		# Send email if we can
+		if T="`type sendmail`"; then
+			# And we have an address to send to
+			EMAIL="`git config tickets.submit`"
+			if [ -n "$EMAIL" ]; then
+				DATA="`sed -e"s/^To:\(.*\)$/To:\1, $EMAIL/i" "$NAME"`"
+				if [ -z "`echo "$DATA" | grep '^To:'`" ]; then
+					DATA="`echo "$DATA" | sed -e"2 i\
+To: $EMAIL
+"`"
+				fi
+				echo "$DATA" | sendmail -ti
+			fi
+		fi
+	fi
 fi
