@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if [ "$1" = "list" -o "$1" = "close" -o "$1" = "comment" ]; then
+	COMMAND="$1"
+	shift
+	git ticket-$COMMAND $*
+	exit
+fi
+
 COMMIT=1
 if [ "$1" = "-C" ]; then
 	COMMIT=0
