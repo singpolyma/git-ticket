@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$1" = "list" -o "$1" = "close" -o "$1" = "comment" ]; then
+if [ "$1" = "list" -o "$1" = "close" -o "$1" = "comment" -o "$1" = "mark" ]; then
 	COMMAND="$1"
 	shift
 	git ticket-$COMMAND $*
@@ -8,10 +8,36 @@ if [ "$1" = "list" -o "$1" = "close" -o "$1" = "comment" ]; then
 fi
 
 COMMIT=1
-if [ "$1" = "-C" ]; then
-	COMMIT=0
-	shift
-fi
+MARK=0
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-C)
+			COMMIT=0
+			shift
+		;;
+		-m)
+			MARK=1
+			shift
+		;;
+		-mC)
+			COMMIT=0
+			MARK=1
+			shift
+		;;
+		-Cm)
+			COMMIT=0
+			MARK=1
+			shift
+		;;
+		-*)
+			echo "Unsupported switch $1" 1>&2
+			exit 1
+		;;
+		*)
+			break
+		;;
+	esac
+done
 
 if [ -z "$1" ]; then
 	echo "You must supply a subject for the ticket." 1>&2
@@ -49,6 +75,10 @@ if [ -z "`tail -n2 "$NAME" | sed -e's/\n\n//'`" ]; then
 	rm -f "$NAME"
 	echo "Cancelled" 1>&2
 	exit
+fi
+
+if [ "$MARK" -eq 1 ]; then
+	git ticket mark "$*"
 fi
 
 git add "$NAME"

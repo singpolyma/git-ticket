@@ -1,0 +1,44 @@
+#!/bin/sh
+
+COMMAND="add"
+if [ "$1" = "rm" -o "$1" = "clear" ]; then
+	COMMAND="$1"
+	shift
+fi
+
+SUBDIRECTORY_OK=1
+if ! . "`git --exec-path`/git-sh-setup"; then
+	exit 1
+fi
+if ! cd_to_toplevel; then
+	exit 1
+fi
+
+if [ -z "`grep .tickets/current .git/info/exclude`" ]; then
+	echo ".tickets/current" >> .git/info/exclude
+fi
+
+mkdir -p .tickets
+cd .tickets
+
+if [ "$COMMAND" = "clear" ]; then
+	rm current
+	echo "Marks cleared"
+	exit
+fi
+
+if [ -z "$1" -o ! -f "$1" ]; then
+	echo "Must specify a valid ticket." 1>&2
+	exit 1
+fi
+
+if [ "$COMMAND" = "rm" ]; then
+	touch current
+	DATA="`sed -e"s/^$1$//" current`"
+	echo "$DATA" > current
+	echo "Mark removed"
+	exit
+fi
+
+echo "$1" >> current
+echo "Marked"
