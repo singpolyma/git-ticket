@@ -17,9 +17,20 @@ fi
 mkdir -p .tickets
 cd .tickets
 
+if [ -z "$*" -a -f current ]; then
+	IFS="
+"
+	for LINE in `cat current`; do
+		if [ -n "$LINE" ]; then
+			"$0" "$LINE"
+		fi
+	done
+	exit
+fi
+
 TICKET="`echo "$*" | sed -e's/\//-/'`"
 
-if [ -z "$1" -o ! -f "$TICKET" ]; then
+if [ -z "$*" -o ! -f "$TICKET" ]; then
 	echo "You must supply a valid ticket to comment on." 1>&2
 	exit 1
 fi
