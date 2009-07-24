@@ -17,15 +17,20 @@ fi
 mkdir -p .tickets
 cd .tickets
 
-if [ -z "$*" -a -f current ]; then
-	IFS="
+if [ -z "$*" ]; then
+	BRANCH="`git status | grep 'On branch' | sed -e's/# On branch //'`"
+	CURRENT="`git config --get-all "tickets.$BRANCH.current"`"
+	if [ -n "$CURRENT" ]; then
+		IFS="
 "
-	for LINE in `cat current`; do
-		if [ -n "$LINE" ]; then
-			"$0" "$LINE"
-		fi
-	done
-	exit
+		for LINE in $CURRENT; do
+			if [ -n "$LINE" ]; then
+				"$0" "$LINE"
+			fi
+			git ticket mark clear
+		done
+		exit
+	fi
 fi
 
 TICKET="`echo "$*" | sed -e's/\//-/'`"
