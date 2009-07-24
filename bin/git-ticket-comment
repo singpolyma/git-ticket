@@ -69,5 +69,5 @@ mv "$NAME" "$NEWNAME"
 
 git add "$NEWNAME"
 if [ "$COMMIT" -eq 1 ]; then
-	git commit -m"New Ticket: $*"
+	git commit -m"Commented: $*"
 fi
