@@ -60,7 +60,7 @@ fi
 if [ -n "`grep '^Status:' "$TICKET"`" ]; then
 	DATA="`sed -e's/^Status: .*$/Status: Closed/i' "$TICKET"`"
 else
-	DATA="`sed -e"2 i\
+	DATA="`sed -e"2 i\\\\
 Status: Closed
 " "$TICKET"`"
 fi

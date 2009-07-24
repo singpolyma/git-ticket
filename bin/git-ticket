@@ -91,7 +91,7 @@ if [ "$COMMIT" -eq 1 ]; then
 			if [ -n "$EMAIL" ]; then
 				DATA="`sed -e"s/^To:\(.*\)$/To:\1, $EMAIL/i" "$NAME"`"
 				if [ -z "`echo "$DATA" | grep '^To:'`" ]; then
-					DATA="`echo "$DATA" | sed -e"2 i\
+					DATA="`echo "$DATA" | sed -e"2 i\\\\
 To: $EMAIL
 "`"
 				fi
