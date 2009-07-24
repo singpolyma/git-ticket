@@ -1,0 +1,30 @@
+#!/bin/sh
+
+SUBDIRECTORY_OK=1
+if ! . "`git --exec-path`/git-sh-setup"; then
+	exit 1
+fi
+if ! cd_to_toplevel; then
+	exit 1
+fi
+
+mkdir -p .tickets
+cd .tickets
+
+case $1 in
+	mbox)
+		IFS="
+		"
+		for MESSAGE in *; do
+			FROM="`grep -i '^From' "$MESSAGE" | sed -e's/^From:\? *//'`"
+			DATE="`grep -i '^Date' "$MESSAGE" | sed -e's/^Date:\? *//'`"
+			echo "From $FROM $DATE"
+			cat "$MESSAGE"
+			echo
+		done
+	;;
+	*)
+		echo "Format not supported." 1>&2
+		exit 1
+	;;
+esac
