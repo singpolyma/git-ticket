@@ -42,6 +42,7 @@ if [ -z "$MESSAGEID" ]; then
 Message-Id: $MESSAGEID
 " "$TICKET"`"
 	echo "$M" > "$TICKET"
+	git add "$TICKET"
 fi
 
 NAME="`mktemp`"
