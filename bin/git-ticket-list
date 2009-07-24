@@ -10,5 +10,20 @@ fi
 
 if [ -d .tickets ]; then
 	cd .tickets
-	grep -vil 'In-Reply-To' * | grep -v current
+
+	case "$1" in
+		comments)
+			shift
+			if [ -z "$*" -o ! -f "$*" ]; then
+				echo "You must specify a valid ticket or comment." 1>&2
+				exit 1
+			fi
+			MESSAGEID="`grep -i Message-Id < "$*" | cut -d':' -f2 | sed -e's/^ *//'`"
+			grep -il "^In-Reply-To: $MESSAGEID$" *
+		;;
+		*)
+			grep -vil '^In-Reply-To:' * | grep -v current
+		;;
+	esac
+
 fi

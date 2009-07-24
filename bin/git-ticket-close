@@ -70,8 +70,16 @@ git add "$TICKET"
 if [ "$COMMIT" -eq 1 ]; then
 	git commit -em"Closes: $*"
 	if [ "$DELETE" -eq 1 ]; then
-		git rm "$TICKET"
-		T="`git rm "$TICKET"-* 2>&1`"
+		rm_thread() {
+			IFS="
+"
+			for LINE in `git ticket list comments "$1"`; do
+				rm_thread "$LINE"
+			done
+			IFS=" "
+			git rm "$1"
+		}
+		rm_thread "$TICKET"
 		cd ..
 		git commit -m"Remove closed ticket $*"
 	fi
