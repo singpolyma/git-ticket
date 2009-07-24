@@ -38,7 +38,7 @@ fi
 MESSAGEID="`grep -i Message-Id < "$TICKET" | cut -d':' -f2 | sed -e's/^ *//'`"
 if [ -z "$MESSAGEID" ]; then
 	MESSAGEID="<`openssl dgst -sha1 < "$TICKET"`@`hostname`>"
-	M="`sed -e"2 i\
+	M="`sed -e"2 i\\\\
 Message-Id: $MESSAGEID
 " "$TICKET"`"
 	echo "$M" > "$TICKET"
