@@ -22,7 +22,7 @@ if [ -d .tickets ]; then
 			grep -il "^In-Reply-To: $MESSAGEID$" *
 		;;
 		*)
-			grep -vil '^In-Reply-To:' * | grep -v current
+			grep -iL '^In-Reply-To:' * | grep -v current
 		;;
 	esac
 
