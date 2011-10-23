@@ -29,7 +29,7 @@ if(count($meta)) {
 echo "\n<p>".str_replace("\n\n","</p>\n\n<p>",$ticket[1])."</p>\n";
 
 // XXX support threaded comments
-$comments = explode("\n",shell_exec("cd '".REPOSITORY_PATH."/.tickets'; git ticket list comments '".basename($_SERVER['QUERY_STRING'])."'"));
+$comments = explode("\n",shell_exec("cd '".REPOSITORY_PATH."/.tickets'; git ticket list comments '".escapeshellarg(basename($_SERVER['QUERY_STRING']))."'"));
 if(count($comments)) {
 	echo "\n<ul>\n";
 	foreach($comments as $comment) {
