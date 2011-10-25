@@ -7,7 +7,7 @@ if(!$_SERVER['QUERY_STRING']) {
 require dirname(__FILE__).'/include/config.php';
 
 // XXX Should come up with a way of escaping so that tickets can be in folders
-$ticket = explode("\n\n",file_get_contents(REPOSITORY_PATH.'/.tickets/'.basename($_SERVER['QUERY_STRING'])),2);
+$ticket = explode("\n\n",file_get_contents(REPOSITORY_PATH.'/.tickets/'.basename($_SERVER['QUERY_STRING'])), 2);
 
 $meta = explode("\n", $ticket[0]);
 if(count($meta)) {
@@ -29,7 +29,7 @@ if(count($meta)) {
 echo "\n<p>".str_replace("\n\n","</p>\n\n<p>",$ticket[1])."</p>\n";
 
 // XXX support threaded comments
-$comments = explode("\n",shell_exec("cd '".REPOSITORY_PATH."/.tickets'; git ticket list comments '".escapeshellarg(basename($_SERVER['QUERY_STRING']))."'"));
+$comments = explode("\n",shell_exec("cd '".REPOSITORY_PATH."/.tickets'; git ticket list comments ".escapeshellarg(basename($_SERVER['QUERY_STRING']))));
 if(count($comments)) {
 	echo "\n<ul>\n";
 	foreach($comments as $comment) {
